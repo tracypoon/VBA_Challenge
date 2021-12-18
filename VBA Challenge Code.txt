@@ -1,0 +1,101 @@
+Sub Stock_Data()
+'Set header Info
+Range("I1").Value = "Ticker"
+Range("J1").Value = "Yearly Change"
+Range("K1").Value = "Percent Change"
+Range("L1").Value = "Total Stock Volume"
+
+  ' Set an initial variable for holding the ticker name
+  Dim Ticker As String
+  Dim Closing_Price As Double
+  Dim Opening_Price As Double
+  Opening_Price = Cells(2, 3)
+  
+  ' Set an initial variable for holding the total per ticker name
+  Dim Total_Stock_Volume As Double
+  Total_Stock_Volume = 0
+
+  ' Keep track of the location for each ticker name in the summary table
+  Dim Summary_Table_Row As Long
+  Summary_Table_Row = 2
+  
+  Dim LastRow As Long
+  LastRow = Cells(Rows.Count, "A").End(xlUp).Row
+  
+  ' Loop through all ticker names
+  For i = 2 To LastRow
+
+    ' Check if we are still within the same ticker name, if it is not...
+    If Cells(i + 1, 1).Value <> Cells(i, 1).Value Then
+
+      ' Set the ticker name
+      Ticker = Cells(i, 1).Value
+      
+      ' Look for change to identify last day of the year
+    Closing_Price = Cells(i, 6).Value
+    Range("J" & Summary_Table_Row).Value = Closing_Price - Opening_Price
+    
+    ' Add to the Total Stock Volume
+      Total_Stock_Volume = Total_Stock_Volume + Cells(i, 7).Value
+      
+    If Opening_Price = 0 Then
+    Range("K" & Summary_Table_Row).Value = 0
+    
+    
+    Else
+    Range("K" & Summary_Table_Row).Value = Range("J" & Summary_Table_Row).Value / Opening_Price
+    
+    End If
+                     
+         
+
+      ' Print the Ticker in the Summary Table
+      Range("I" & Summary_Table_Row).Value = Ticker
+
+      ' Print the Total Stock Volume to the Summary Table
+      Range("L" & Summary_Table_Row).Value = Total_Stock_Volume
+
+      ' Add one to the summary table row
+      Summary_Table_Row = Summary_Table_Row + 1
+      
+      ' Reset the Total Stock Volume
+      Total_Stock_Volume = 0
+      
+       Opening_Price = Cells(i + 1, 3).Value
+       
+       
+
+    ' If the cell immediately following a row is the same Ticker name...
+    Else
+
+         
+        ' Add to the Total Stock Volume
+      Total_Stock_Volume = Total_Stock_Volume + Cells(i, 7).Value
+
+
+    End If
+    
+  Next i
+  
+  Columns("K").Style = "percent"
+  
+  Dim rng As Range
+    Dim condition1 As FormatCondition, condition2 As FormatCondition
+    Set rng = Range("J2:J" & LastRow)
+    Set condition1 = rng.FormatConditions.Add(xlCellValue, xlGreater, "=0")
+    Set condition2 = rng.FormatConditions.Add(xlCellValue, xlLess, "=0")
+    
+    With condition1
+    .Interior.Color = vbGreen
+   End With
+
+   With condition2
+     .Interior.Color = vbRed
+     
+   End With
+   
+
+End Sub
+
+
+
